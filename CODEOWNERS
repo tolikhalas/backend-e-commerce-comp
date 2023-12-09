@@ -6,8 +6,8 @@
 
 # Any changes to web-http/ and recursively all the files and subdirectories will
 # require a code owner review.
-web-http/**    tolikhalas
+web-http/    @tolikhalas
 
 # Any changes to infra/ and recursively all the files and subdirectories will
 # require a code owner review.
-infra/**  tolikhalas
+infra/  @tolikhalas
