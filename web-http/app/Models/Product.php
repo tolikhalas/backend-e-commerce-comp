@@ -15,8 +15,9 @@ class Product extends Model
         'name',
         'brand',
         'model_name',
-        'is_available',
-        'quanity',
-        'rate'
+        'quantity',
+        'rate',
+        'description',
+        'image',
     ];
 }

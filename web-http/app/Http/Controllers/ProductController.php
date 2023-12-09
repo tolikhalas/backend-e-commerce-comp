@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -50,9 +53,9 @@ class ProductController extends Controller
             "name" => "required|string|max:255",
             'brand' => "required|string|max:255",
             'model_name' => "required|string|max:255",
-            'is_available' => "required|boolean",
-            'quanity' => "required|numeric|min:0",
-            'rate' => "required|min:1.00|max:5.00",
+            'rate' => "min:1.00|max:5.00",
+            'quantity' => "required|numeric|min:0",
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ( $validator->fails() ) {
@@ -63,10 +66,19 @@ class ProductController extends Controller
             "name" => $request->name,
             "brand" => $request->brand,
             "model_name" => $request->model_name,
-            "is_available" => $request->is_available,
-            "quanity" => $request->quanity,
+            "quantity" => $request->quantity,
             "rate" => $request->rate,
+            "description" => $request->description,
         ]);
+
+        if ($request->file('image')->isValid()) {
+            $imageName = Str::random(32).".".$request->image->getClientOriginalExtension();
+            Storage::disk('public')->put($imageName, file_get_contents($request->image));
+            $product->update([
+                "image" => $imageName,
+            ]);
+        }
+
 
         if ($product) {
             $data = [
@@ -90,23 +102,31 @@ class ProductController extends Controller
                 "name" => "required|string|max:255",
                 'brand' => "required|string|max:255",
                 'model_name' => "required|string|max:255",
-                'is_available' => "required|boolean",
-                'quanity' => "required|numeric|min:0",
-                'rate' => "required|min:1.00|max:5.00",
+                'rate' => "min:1.00|max:5.00",
+                'quantity' => "required|numeric|min:0",
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
     
             if ( $validator->fails() ) {
                 return response()->json(["status"=> 406,"message"=> $validator->errors()],406);
             }
            
-            $product->update([
+            $product = Product::create([
                 "name" => $request->name,
                 "brand" => $request->brand,
                 "model_name" => $request->model_name,
-                "is_available" => $request->is_available,
-                "quanity" => $request->quanity,
+                "quantity" => $request->quantity,
                 "rate" => $request->rate,
+                "description" => $request->description,
             ]);
+
+            if ($request->file('image')->isValid()) {
+                $imageName = Str::random(32).".".$request->image->getClientOriginalExtension();
+                Storage::disk('public')->put($imageName, file_get_contents($request->image));
+                $product->update([
+                    "image" => $imageName,
+                ]);
+            }
 
             $data = [
                 "status"=> 200,
