@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -26,7 +29,7 @@ class ProductController extends Controller
         }
     }
 
-    public function show($id) {
+    public function show(int $id) {
         $product = Product::find($id);
 
         if ($product) {
@@ -50,9 +53,9 @@ class ProductController extends Controller
             "name" => "required|string|max:255",
             'brand' => "required|string|max:255",
             'model_name' => "required|string|max:255",
-            'is_available' => "required|boolean",
-            'quanity' => "required|numeric|min:0",
-            'rate' => "required|min:1.00|max:5.00",
+            'rate' => "min:1.00|max:5.00",
+            'quantity' => "required|numeric|min:0",
+            'image' => 'image|nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ( $validator->fails() ) {
@@ -63,18 +66,27 @@ class ProductController extends Controller
             "name" => $request->name,
             "brand" => $request->brand,
             "model_name" => $request->model_name,
-            "is_available" => $request->is_available,
-            "quanity" => $request->quanity,
+            "quantity" => $request->quantity,
             "rate" => $request->rate,
+            "description" => $request->description,
         ]);
+
+        if ($request->file('image')) {
+            $imageName = Str::random(32).".".$request->image->getClientOriginalExtension();
+            Storage::disk('public')->put($imageName, file_get_contents($request->image));
+            $product->update([
+                "image" => $imageName,
+            ]);
+        }
+
 
         if ($product) {
             $data = [
-                "status" => 200,
+                "status" => 201,
                 "message" => "$product->name successfully created",
                 "product" => $product,
             ];
-            return response()->json($data, 200);
+            return response()->json($data, 201);
         } else {
             return response()->json(["status"=> 500,"message"=> "Somethind went wrong during creating $request->name"],500);
         }
@@ -84,15 +96,14 @@ class ProductController extends Controller
     public function update(Request $request, int $id) {
 
         $product = Product::find($id);
-
         if ($product) {
             $validator = Validator::make($request->all(), [
                 "name" => "required|string|max:255",
                 'brand' => "required|string|max:255",
                 'model_name' => "required|string|max:255",
-                'is_available' => "required|boolean",
-                'quanity' => "required|numeric|min:0",
-                'rate' => "required|min:1.00|max:5.00",
+                'rate' => "min:1.00|max:5.00",
+                'quantity' => "required|numeric|min:0",
+                'image' => 'image|nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
     
             if ( $validator->fails() ) {
@@ -103,10 +114,18 @@ class ProductController extends Controller
                 "name" => $request->name,
                 "brand" => $request->brand,
                 "model_name" => $request->model_name,
-                "is_available" => $request->is_available,
-                "quanity" => $request->quanity,
+                "quantity" => $request->quantity,
                 "rate" => $request->rate,
+                "description" => $request->description,
             ]);
+
+            if ($request->file('image')) {
+                $imageName = Str::random(32).".".$request->image->getClientOriginalExtension();
+                Storage::disk('public')->put($imageName, file_get_contents($request->image));
+                $product->update([
+                    "image" => $imageName,
+                ]);
+            }
 
             $data = [
                 "status"=> 200,
