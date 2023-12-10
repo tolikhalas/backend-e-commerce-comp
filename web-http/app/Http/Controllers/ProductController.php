@@ -82,11 +82,11 @@ class ProductController extends Controller
 
         if ($product) {
             $data = [
-                "status" => 200,
+                "status" => 201,
                 "message" => "$product->name successfully created",
                 "product" => $product,
             ];
-            return response()->json($data, 200);
+            return response()->json($data, 201);
         } else {
             return response()->json(["status"=> 500,"message"=> "Somethind went wrong during creating $request->name"],500);
         }
@@ -108,7 +108,7 @@ class ProductController extends Controller
             ]);
     
             if ( $validator->fails() ) {
-                return response()->json(["status"=> 406,"message"=> $validator->errors()],406);
+                return response()->json(["status"=> 406,"messages"=> $validator->errors()],406);
             }
            
             $product = Product::create([
