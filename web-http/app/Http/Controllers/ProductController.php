@@ -29,7 +29,7 @@ class ProductController extends Controller
         }
     }
 
-    public function show($id) {
+    public function show(int $id) {
         $product = Product::find($id);
 
         if ($product) {
@@ -71,7 +71,7 @@ class ProductController extends Controller
             "description" => $request->description,
         ]);
 
-        if ($request->file('image')->isValid()) {
+        if ($request->file('image')) {
             $imageName = Str::random(32).".".$request->image->getClientOriginalExtension();
             Storage::disk('public')->put($imageName, file_get_contents($request->image));
             $product->update([
@@ -96,7 +96,6 @@ class ProductController extends Controller
     public function update(Request $request, int $id) {
 
         $product = Product::find($id);
-
         if ($product) {
             $validator = Validator::make($request->all(), [
                 "name" => "required|string|max:255",
@@ -108,10 +107,10 @@ class ProductController extends Controller
             ]);
     
             if ( $validator->fails() ) {
-                return response()->json(["status"=> 406,"messages"=> $validator->errors()],406);
+                return response()->json(["status"=> 406,"message"=> $validator->errors()],406);
             }
            
-            $product = Product::create([
+            $product->update([
                 "name" => $request->name,
                 "brand" => $request->brand,
                 "model_name" => $request->model_name,
@@ -120,7 +119,7 @@ class ProductController extends Controller
                 "description" => $request->description,
             ]);
 
-            if ($request->file('image')->isValid()) {
+            if ($request->file('image')) {
                 $imageName = Str::random(32).".".$request->image->getClientOriginalExtension();
                 Storage::disk('public')->put($imageName, file_get_contents($request->image));
                 $product->update([
