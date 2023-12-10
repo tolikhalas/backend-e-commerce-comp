@@ -55,7 +55,7 @@ class ProductController extends Controller
             'model_name' => "required|string|max:255",
             'rate' => "min:1.00|max:5.00",
             'quantity' => "required|numeric|min:0",
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'image|nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ( $validator->fails() ) {
@@ -103,7 +103,7 @@ class ProductController extends Controller
                 'model_name' => "required|string|max:255",
                 'rate' => "min:1.00|max:5.00",
                 'quantity' => "required|numeric|min:0",
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image' => 'image|nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
     
             if ( $validator->fails() ) {
